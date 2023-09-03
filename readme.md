@@ -1,5 +1,7 @@
 Node JS File Upload
 
+Please create folder: **public/uploads**
+
 Please execute following:
 
 ```
