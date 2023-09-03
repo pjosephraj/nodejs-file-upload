@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style-type: none;
+    }
+    .container, .container-head {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .container-head{
+      padding: 1.5rem 0;
+      border-bottom: 1px solid lightgray;
+    }
+    .container-head input {
+      padding: 1rem 0;
+      font-size: 1rem;
+    }
+    #upload-btn {
+      font-size: 1.2rem;
+      display: inline-block;
+      border: none;
+      padding: 1rem;
+      border-radius: 6px;
+      background: blueviolet;
+      color: white;
+      text-transform: uppercase;
+      font-weight: bold;
+      border: 1px solid blueviolet;
+      transition: .2s ease-in-out;
+      cursor: pointer;
+    }
+    #upload-btn[disabled] {
+      background-color: lightgray;
+      border-color: lightgray;
+      pointer-events: none;
+    }
+    #upload-btn:hover {
+      background-color: blue;
+      border-color: blue;
+    }
+    #files-list {
+      font-size: 1.3rem;
+    }
+    li {
+      padding: .3rem 0;
+    }
+    h2 {
+      color: slategray;
+      margin-bottom: .5rem;
+    }
+  </style>
+</head>
+  <div class="container">
+    <div class="container-head">
+      <input type="file" id="file-input">
+      <button id="upload-btn" type="button" disabled>Upload</button>
+    </div>
+    <div class="container-body">
+      <h2>Uploaded files: </h2>
+      <div id="files-list">
+        
+      </div>
+    </div>
+  </div>
+<body>
+
+  <script>
+    getImages();
+    const fileInputElm = document.getElementById('file-input');
+    const uploadBtnElm = document.getElementById('upload-btn');
+    const filesListElm = document.getElementById('files-list');
+    fileInputElm.addEventListener('change', (event) => {
+      const tgtValue = event.target.value;
+      if(tgtValue) {
+        uploadBtnElm.removeAttribute('disabled');
+      } else {
+        uploadBtnElm.setAttribute('disabled', true);
+      }
+    });
+
+    uploadBtnElm.addEventListener('click', (event) => {
+      const data = new FormData();
+      data.append('image', fileInputElm.files[0]);
+      fetch('/upload', {
+        method: 'POST',
+        body: data
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.success) {
+          getImages();
+        } else {
+          alert('Unknown Error, Please try again');
+        }
+      });
+    });
+
+    function getImages() {
+      const images = fetch('/get-images')
+        .then(res => res.json())
+        .then(res => {
+          const elms = [];
+          const ulElm = document.createElement('ul');
+          res.files.forEach(itm => {
+            const liElm = document.createElement('li');
+            const aElm = document.createElement('a');
+            aElm.href=itm;
+            aElm.target = '_blank';
+            aElm.innerText = itm.slice(itm.lastIndexOf('/') + 1);
+            liElm.appendChild(aElm);
+            ulElm.child (liElm);
+          });
+          filesListElm.innerHTML = '';
+          if(res.files.length) {
+            filesListElm.appendChild(ulElm);
+          } else {
+            filesListElm.innerText = 'No files uploaded yet.'
+          }
+        });
+    }
+  </script>
+</body>
+
+</html>
