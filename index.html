@@ -126,7 +126,7 @@
             aElm.target = '_blank';
             aElm.innerText = itm.slice(itm.lastIndexOf('/') + 1);
             liElm.appendChild(aElm);
-            ulElm.child (liElm);
+            ulElm.appendChild(liElm);
           });
           filesListElm.innerHTML = '';
           if(res.files.length) {
